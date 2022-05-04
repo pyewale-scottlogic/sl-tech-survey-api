@@ -25,20 +25,18 @@ namespace TechSurveyAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Company()
         {
-            //try
-            //{
-            //    var companies = await _repositoryWrapper.Company.GetAllCompanysAsync();
-            //    var companiesResult = _mapper.Map<IEnumerable<CompanyDTO>>(companies);
-            //    return Ok(companiesResult);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return StatusCode(500, "Internal server error");
-            //}
-
+            try
+            {
+                _logger.LogInfo($"In Get Company");
                 var companies = await _repositoryWrapper.Company.GetAllCompanysAsync();
                 var companiesResult = _mapper.Map<IEnumerable<CompanyDTO>>(companies);
                 return Ok(companiesResult);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong in the Get Company service method {ex}");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         [HttpGet("{id}", Name = "CompanyById")]
