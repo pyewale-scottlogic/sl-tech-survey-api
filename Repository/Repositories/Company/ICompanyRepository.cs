@@ -6,7 +6,7 @@ namespace Repository.Repositories
     {
         Task<IEnumerable<Company>> GetAllCompanysAsync();
         Task<Company> GetCompanyByIdAsync(int CompanyId);
-        //Task<Company> GetCompanyWithDetailsAsync(int CompanyId);
+        
         void CreateCompany(Company Company);
         void UpdateCompany(Company Company);
         void DeleteCompany(Company Company);

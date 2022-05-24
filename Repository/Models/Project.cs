@@ -11,7 +11,9 @@ namespace Repository.Models
         }
 
         public int ProjectId { get; set; }
-        public string Name { get; set; } = null!;
+        public string ProjectName { get; set; } = null!;
+        public string? KimbleUrl { get; set; }
+        public int? KimbleProjectId { get; set; }
         public int? CompanyId { get; set; }
 
         public virtual Company? Company { get; set; }

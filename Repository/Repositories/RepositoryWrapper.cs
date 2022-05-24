@@ -7,12 +7,27 @@ namespace Repository.Repositories
         private TechnologyStackContext _repoContext;
 
         private ICompanyRepository _company;
-        private IEmployeeRepository _employee;
+        private IProjectRepository      _project;
+        private IEmployeeRepository     _employee;
+        private IPlatformRepository     _platform;
+        private ITechnologyRepository   _technology;
+        //private ISurveyRepository       _survey;
+        private IProjectOwnerRepository _projectOwner;
+        private IProjectSurveyRepository _projectSurvey;
+        
 
         public RepositoryWrapper(TechnologyStackContext repositoryContext)
         {
             _repoContext = repositoryContext;
+            _project = new ProjectRepository(_repoContext);
+            _employee = new EmployeeRepository(_repoContext);
+            _platform = new PlatformRepository(_repoContext);
+            _technology = new TechnologyRepository(_repoContext);
+            //_survey = new SurveyRepository(_repoContext);
+            _projectOwner = new ProjectOwnerRepository(_repoContext);
+            _projectSurvey = new ProjectSurveyRepository(_repoContext);
         }
+
         public async Task SaveAsync()
         {
             await _repoContext.SaveChangesAsync();
@@ -41,14 +56,16 @@ namespace Repository.Repositories
             }
         }
 
-        public IPlatformRepository Platform => throw new NotImplementedException();
+        public IPlatformRepository Platform { get { return _platform; } }
 
-        public IProjectRepository Project => throw new NotImplementedException();
+        public IProjectRepository Project { get { return _project; } }
 
-        public IProjectOwnerRepository ProjectOwner => throw new NotImplementedException();
+        public IProjectOwnerRepository ProjectOwner { get { return _projectOwner; } }
 
-        public ISurveyRepository Survey => throw new NotImplementedException();
+        //public ISurveyRepository Survey { get { return _survey; } }
 
-        public ITechnologyRepository Technology => throw new NotImplementedException();
+        public ITechnologyRepository Technology { get { return _technology; } }
+
+        public IProjectSurveyRepository ProjectSurvey { get { return _projectSurvey; } }
     }
 }

@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\CompanyControllerOld.cs" />
+    <Compile Remove="Controllers\SurveysController.cs" />
+    <Compile Remove="ProjectSurveyMapperProfile.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,10 +37,6 @@
   <ItemGroup>
     <ProjectReference Include="..\LoggerService\LoggerService.csproj" />
     <ProjectReference Include="..\Repository\Repository.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DTOs\ProjectSurvey\" />
   </ItemGroup>
 
 </Project>

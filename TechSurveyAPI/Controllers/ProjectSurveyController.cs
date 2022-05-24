@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using LoggerService;
 using Microsoft.AspNetCore.Mvc;
+using Repository.Models;
 using Repository.Repositories;
+using TechSurveyAPI.DTOs;
 
 namespace TechSurveyAPI.Controllers
 {
@@ -9,24 +11,24 @@ namespace TechSurveyAPI.Controllers
     [ApiController]
     public class ProjectSurveyController : ControllerBase
     {
-        //private IRepositoryWrapper _repositoryWrapper;
-        //private IMapper _mapper;
-        //private ILoggerManager _logger;
+        private IRepositoryWrapper _repositoryWrapper;
+        private IMapper _mapper;
+        private ILoggerManager _logger;
 
-        //public ProjectSurveyController(IRepositoryWrapper repository, IMapper mapper, ILoggerManager logger)
-        //{
-        //    _repositoryWrapper = repository;
-        //    _mapper = mapper;
-        //    _logger = logger;
-        //}
+        public ProjectSurveyController(IRepositoryWrapper repository, IMapper mapper, ILoggerManager logger)
+        {
+            _repositoryWrapper = repository;
+            _mapper = mapper;
+            _logger = logger;
+        }
 
         //[HttpGet]
-        //public async Task<IActionResult> Company()
+        //public async Task<IActionResult> ProjectSurvey()
         //{
         //    try
         //    {
-        //        var companies = await _repositoryWrapper.Company.GetAllCompanysAsync();
-        //        var companiesResult = _mapper.Map<IEnumerable<CompanyDTO>>(companies);
+        //        var companies = await _repositoryWrapper.ProjectSurvey.GetAllProjectSurveysAsync();
+        //        var companiesResult = _mapper.Map<IEnumerable<ProjectSurveyDTO>>(companies);
         //        return Ok(companiesResult);
         //    }
         //    catch (Exception ex)
@@ -35,115 +37,117 @@ namespace TechSurveyAPI.Controllers
         //    }
         //}
 
-        //[HttpGet("{id}", Name = "CompanyById")]
-        //public async Task<IActionResult> Company(int id)
-        //{
-        //    try
-        //    {
-        //        if (id == 0)
-        //        {
-        //            return BadRequest();
-        //        }
-        //        Company companyExtracted = await _repositoryWrapper.Company.GetCompanyByIdAsync(id);
+        [HttpGet("{id}", Name = "ProjectSurveyById")]
+        public async Task<IActionResult> ProjectSurvey(int id)
+        {
+            try
+            {
+                if (id == 0)
+                {
+                    return BadRequest();
+                }
+                ProjectSurvey projectSurveyExtracted = await _repositoryWrapper.ProjectSurvey.GetProjectSurveyAndRelatedDataByIdAsync(id);
 
-        //        if (companyExtracted == null)
-        //        {
-        //            return NotFound();
-        //        }
+                if (projectSurveyExtracted == null)
+                {
+                    return NotFound();
+                }
 
-        //        //ApiResult result = new ApiResult { Data = _mapper.Map<CompanyDTO>(companyExtracted), ErrorMessage = "" };
-        //        //return Ok(result);
+                return Ok(_mapper.Map<ProjectSurveyDTO>(projectSurveyExtracted));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
-        //        return Ok(_mapper.Map<CompanyDTO>(companyExtracted));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Company([FromBody] CompanyAddDTO companyAddDTO)
-        //{
-        //    try
-        //    {
-        //        if (companyAddDTO == null)
-        //        {
-        //            return BadRequest();
-        //        }
+        [HttpPost]
+        public async Task<IActionResult> ProjectSurvey([FromBody] ProjectSurveyAddDTO projectSurveyAddDTO)
+        {
+            try
+            {
+                if (projectSurveyAddDTO == null)
+                {
+                    return BadRequest();
+                }
 
 
-        //        var _mappedCompany = _mapper.Map<Company>(companyAddDTO);
+                var _mappedProjectSurvey= _mapper.Map<ProjectSurvey>(projectSurveyAddDTO);
 
-        //        _repositoryWrapper.Company.CreateCompany(_mappedCompany);
-        //        await _repositoryWrapper.SaveAsync();
+                _repositoryWrapper.ProjectSurvey.CreateProjectSurvey(_mappedProjectSurvey);
 
-        //        var _companyDTO = _mapper.Map<CompanyDTO>(_mappedCompany);
+                await _repositoryWrapper.SaveAsync();
 
-        //        ApiResult result = new ApiResult { Data = _companyDTO, ErrorMessage = "" };
-        //        return CreatedAtRoute("CompanyById", new { id = _companyDTO.CompanyId }, result);
+                var _projectSurveyDTO = _mapper.Map<ProjectSurveyDTO>(_mappedProjectSurvey);
 
-        //        //return CreatedAtRoute("CompanyById", new { id = _companyDTO.CompanyId }, _companyDTO);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
+                return CreatedAtRoute("ProjectSurveyById", new { id = _projectSurveyDTO.ProjectSurveyId }, _projectSurveyDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
 
-        //[HttpPut]
-        //public async Task<IActionResult> Company([FromBody] CompanyUpdateDTO companyUpdateDTO)
-        //{
-        //    try
-        //    {
-        //        if (companyUpdateDTO == null || !ModelState.IsValid)
-        //        {
-        //            return BadRequest();
-        //        }
+        [HttpPut]
+        public async Task<IActionResult> ProjectSurvey([FromBody]ProjectSurveyUpdateDTO projectSurveyUpdateDTO)
+        {
+            try
+            {
+                if (projectSurveyUpdateDTO == null || !ModelState.IsValid)
+                {
+                    return BadRequest();
+                }
 
-        //        Company companyExtracted = await _repositoryWrapper.Company.GetCompanyByIdAsync(companyUpdateDTO.CompanyId);
+                ProjectSurvey projectSurveyExtracted = await _repositoryWrapper.ProjectSurvey.GetProjectSurveyAndRelatedDataByIdAsync(projectSurveyUpdateDTO.ProjectSurveyId);
 
-        //        if (companyExtracted == null)
-        //        {
-        //            return NotFound();
-        //        }
+                if (projectSurveyExtracted == null)
+                {
+                    return NotFound();
+                }
 
-        //        var _mappedCompany = _mapper.Map<Company>(companyUpdateDTO);
+                //Phase2 : We need to figure out how to use only one SaveAsync.
+                //Somehow cascade delete is not working on child entities hence I have separately deleted related data
+                //Or we can update object in context with latest data and use saveAsync only once
+                projectSurveyExtracted.Technologies.Clear();
+                projectSurveyExtracted.ProjectOwners.Clear();
+                await _repositoryWrapper.SaveAsync();
 
-        //        _repositoryWrapper.Company.UpdateCompany(_mappedCompany);
-        //        await _repositoryWrapper.SaveAsync();
+                var _mappedProjectSurvey = _mapper.Map<ProjectSurvey>(projectSurveyUpdateDTO);
 
-        //        return NoContent();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
+                _repositoryWrapper.ProjectSurvey.UpdateProjectSurvey(_mappedProjectSurvey);
+                await _repositoryWrapper.SaveAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
 
 
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteCompany(int id)
-        //{
-        //    try
-        //    {
-        //        Company companyExtracted = await _repositoryWrapper.Company.GetCompanyByIdAsync(id);
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProjectSurvey(int id)
+        {
+            try
+            {
+                ProjectSurvey projectSurveyExtracted = await _repositoryWrapper.ProjectSurvey.GetProjectSurveyByIdAsync(id);
 
-        //        if (companyExtracted == null)
-        //        {
-        //            return NotFound();
-        //        }
+                if (projectSurveyExtracted == null)
+                {
+                    return NotFound();
+                }
 
-        //        _repositoryWrapper.Company.DeleteCompany(companyExtracted);
-        //        await _repositoryWrapper.SaveAsync();
+                _repositoryWrapper.ProjectSurvey.DeleteProjectSurvey(projectSurveyExtracted);
+                await _repositoryWrapper.SaveAsync();
 
-        //        return NoContent();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
     }
 }

@@ -11,6 +11,6 @@ namespace TechSurveyAPI
         }
 
         public static void ConfigureLoggerService(this IServiceCollection services) =>
- services.AddSingleton<ILoggerManager, LoggerManager>();
+                                                    services.AddSingleton<ILoggerManager, LoggerManager>();
     }
 }

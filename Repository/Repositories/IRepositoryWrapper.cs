@@ -10,9 +10,11 @@
 
         IProjectRepository Project { get; }
 
+        IProjectSurveyRepository ProjectSurvey { get; }
+
         IProjectOwnerRepository ProjectOwner { get; }
 
-        ISurveyRepository Survey { get; }
+        //ISurveyRepository Survey { get; }
 
         ITechnologyRepository Technology { get; }
         Task SaveAsync();
