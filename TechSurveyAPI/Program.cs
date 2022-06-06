@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 // Add services to the container.
-
+builder.Services.AddCORSService();
 builder.Services.ConfigureLoggerService();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<TechnologyStackContext>(options =>
@@ -21,6 +21,8 @@ builder.Services.ConfigureRepositoryWrapper();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
+app.UseCors("_myAllowSpecificOrigins");
 
 app.UseHttpsRedirection();
 

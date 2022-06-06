@@ -26,9 +26,7 @@ namespace Repository.Repositories
         }
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
-            return await FindAll()
-               .OrderBy(ow => ow.ProjectName)
-               .ToListAsync();
+            return await TechnologyStackContext.Projects.Include(pr => pr.Company).OrderBy(ow => ow.ProjectName).ToListAsync();
         }
 
         public async Task<Project> GetProjectByIdAsync(int projectId)
@@ -39,7 +37,7 @@ namespace Repository.Repositories
 
         public async Task<IEnumerable<Project>> GetAllProjectsForCompanyAsync(int CompnayId)
         {
-            return await FindByCondition(project => project.CompanyId.Equals(CompnayId)).ToListAsync();
+            return await FindByCondition(project => project.CompanyId.Equals(CompnayId)).Include(pr => pr.Company).OrderBy(ow => ow.ProjectName).ToListAsync();
         }
     }
 }

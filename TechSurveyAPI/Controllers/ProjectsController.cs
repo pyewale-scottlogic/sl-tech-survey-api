@@ -149,8 +149,10 @@ namespace TechSurveyAPI.Controllers
         }
 
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProject(int companyId, int id)
+        
+        [Route("/api/[controller]/{id}")]
+        [HttpDelete]
+        public async Task<IActionResult> Project(int id)
         {
             try
             {
