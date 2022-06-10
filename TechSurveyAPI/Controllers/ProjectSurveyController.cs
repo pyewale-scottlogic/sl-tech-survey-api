@@ -22,21 +22,6 @@ namespace TechSurveyAPI.Controllers
             _logger = logger;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> ProjectSurvey()
-        //{
-        //    try
-        //    {
-        //        var companies = await _repositoryWrapper.ProjectSurvey.GetAllProjectSurveysAsync();
-        //        var companiesResult = _mapper.Map<IEnumerable<ProjectSurveyDTO>>(companies);
-        //        return Ok(companiesResult);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, "Internal server error");
-        //    }
-        //}
-
         [HttpGet("{id}", Name = "ProjectSurveyById")]
         public async Task<IActionResult> ProjectSurvey(int id)
         {
@@ -54,6 +39,32 @@ namespace TechSurveyAPI.Controllers
                 }
 
                 return Ok(_mapper.Map<ProjectSurveyDTO>(projectSurveyExtracted));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+
+        [Route("projects/{projectId}")]
+        [HttpGet("{projectId}", Name = "ProjectSurveyForProjectId")]
+        public async Task<IActionResult> ProjectSurveyForProjectId(int projectId)
+        {
+            try
+            {
+                if (projectId == 0)
+                {
+                    return BadRequest();
+                }
+                var projectSurveyExtracted = await _repositoryWrapper.ProjectSurvey.GetProjectSurveyAndRelatedDataByForProjectIdAsync(projectId);
+
+                if (projectSurveyExtracted == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(_mapper.Map <IEnumerable<ProjectSurveyDTO>>(projectSurveyExtracted));
             }
             catch (Exception ex)
             {
@@ -149,5 +160,7 @@ namespace TechSurveyAPI.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
+
     }
 }

@@ -22,6 +22,14 @@ namespace Repository.Repositories
             Delete(ProjectSurvey);
         }
 
+        public async Task<IEnumerable<ProjectSurvey>> GetProjectSurveyAndRelatedDataByForProjectIdAsync(int projectId)
+        {
+            return await FindByCondition(sr => sr.ProjectId.Equals(projectId)).Include(sr => sr.Technologies).Include(sr => sr.ProjectOwners)
+                .Include(sr => sr.Platform).Include(sr => sr.Project).ThenInclude(it => it.Company).ToListAsync();
+
+
+        }
+
         public async Task<ProjectSurvey> GetProjectSurveyAndRelatedDataByIdAsync(int projectSurveyId)
         {
             return await this.TechnologyStackContext.ProjectSurveys.Include(sr => sr.Technologies).Include(sr => sr.ProjectOwners)

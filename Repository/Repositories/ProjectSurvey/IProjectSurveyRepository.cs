@@ -7,6 +7,8 @@ namespace Repository.Repositories
     {
         Task<ProjectSurvey> GetProjectSurveyAndRelatedDataByIdAsync(int projectSurveyId);
 
+        Task<IEnumerable<ProjectSurvey>> GetProjectSurveyAndRelatedDataByForProjectIdAsync(int projectId);
+
         Task<ProjectSurvey> GetProjectSurveyByIdAsync(int projectSurveyId);
         void CreateProjectSurvey(ProjectSurvey projectSurvey);
         void UpdateProjectSurvey(ProjectSurvey projectSurvey);

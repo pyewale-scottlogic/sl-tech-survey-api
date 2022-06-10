@@ -38,6 +38,8 @@ namespace TechSurveyAPI
             CreateMap<PlatformAddDTO, Platform>();
 
             CreateMap<PlatformUpdateDTO, Platform>();
+
+            CreateMap<PlatformDTO, Platform>();
             #endregion Platform
 
 
