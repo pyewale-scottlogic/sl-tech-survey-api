@@ -9,5 +9,9 @@ namespace TechSurveyAPI.DTOs
 
         [Required(ErrorMessage = "CompanyId is mandatory to add Project!")]
         public int? CompanyId { get; set; }
+
+        public string KimbleUrl { get; set; }
+
+        public ICollection<ProjectOwnerAddDTO>? ProjectOwners { get; set; }
     }
 }

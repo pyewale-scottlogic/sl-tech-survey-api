@@ -7,12 +7,12 @@ namespace TechSurveyAPI.Models
     {
         public Technology()
         {
-            ProjectTechStacks = new HashSet<ProjectTechStack>();
+            ProjectSurveys = new HashSet<ProjectSurvey>();
         }
 
         public int TechnologyId { get; set; }
         public string Name { get; set; } = null!;
 
-        public virtual ICollection<ProjectTechStack> ProjectTechStacks { get; set; }
+        public virtual ICollection<ProjectSurvey> ProjectSurveys { get; set; }
     }
 }

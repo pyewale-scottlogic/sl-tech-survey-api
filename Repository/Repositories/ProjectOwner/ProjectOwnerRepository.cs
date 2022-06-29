@@ -31,10 +31,24 @@ namespace Repository.Repositories
                .ToListAsync();
         }
 
-        public async Task<ProjectOwner> GetProjectOwnerByProjectSurveyIdAsync(int projectSurveyId)
+        //public async Task<ProjectOwner> GetProjectOwnerByProjectId(int projectId)
+        //{
+        //    return await FindByCondition(projectOwner => projectOwner.ProjectId.Equals(projectId))
+        //         .FirstOrDefaultAsync();
+        //}
+
+        public async Task<ProjectOwner> GetProjectOwnerAsync(int projectOwnerId)
         {
-            return await FindByCondition(projectOwner => projectOwner.ProjectSurveyId.Equals(projectSurveyId))
-                 .FirstOrDefaultAsync();
+            return await FindByCondition(projectOwner => projectOwner.ProjectOwnerId.Equals(projectOwnerId)).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<ProjectOwner>> GetProjectOwnersByProjectId(int ProjectId)
+        {
+            return await FindByCondition(projectOwner => projectOwner.ProjectId.Equals(ProjectId)).
+                Include(po => po.AccountOwner).
+                Include(po => po.TechLead).
+                Include(po => po.Project)
+                .OrderBy(po => po.FromDate).ToListAsync();
         }
     }
 }

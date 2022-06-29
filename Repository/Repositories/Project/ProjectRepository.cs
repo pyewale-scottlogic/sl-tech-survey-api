@@ -37,7 +37,11 @@ namespace Repository.Repositories
 
         public async Task<IEnumerable<Project>> GetAllProjectsForCompanyAsync(int CompnayId)
         {
-            return await FindByCondition(project => project.CompanyId.Equals(CompnayId)).Include(pr => pr.Company).OrderBy(ow => ow.ProjectName).ToListAsync();
+            return await FindByCondition(project => project.CompanyId.Equals(CompnayId)).
+                Include(pr => pr.Company).
+                Include(pr => pr.ProjectOwners).ThenInclude(po => po.AccountOwner).
+                Include(pr => pr.ProjectOwners).ThenInclude(po => po.TechLead).
+                OrderBy(ow => ow.ProjectName).ToListAsync();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace TechSurveyAPI
 
             CreateMap<ProjectAddDTO, Project>();
 
-            CreateMap<ProjectUpdateDTO, Project>();
+            CreateMap<ProjectUpdateDTO, Project>();            
             #endregion Project
 
             #region Employee
@@ -69,7 +69,7 @@ namespace TechSurveyAPI
 
             CreateMap<ProjectOwnerUpdateDTO, ProjectOwner>();
 
-            CreateMap<ProjectOwnerDTO, ProjectOwner>();
+            CreateMap<ProjectOwnerDTO, ProjectOwner>().PreserveReferences();
             #endregion ProjectOwner
         }
 

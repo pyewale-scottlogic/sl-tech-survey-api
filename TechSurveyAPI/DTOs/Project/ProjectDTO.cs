@@ -7,5 +7,9 @@
         public int CompanyId { get; set; }
             
         public string CompanyName { get; set; } = null!;
+
+        public string KimbleUrl { get; set; } 
+
+        public ICollection<ProjectOwnerDTO> ProjectOwners { get; set; }
     }
 }

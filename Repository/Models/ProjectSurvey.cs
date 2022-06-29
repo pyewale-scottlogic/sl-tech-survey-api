@@ -7,21 +7,19 @@ namespace Repository.Models
     {
         public ProjectSurvey()
         {
-            ProjectOwners = new HashSet<ProjectOwner>();
+            Platforms = new HashSet<Platform>();
             Technologies = new HashSet<Technology>();
         }
 
         public int ProjectSurveyId { get; set; }
         public int? ProjectId { get; set; }
-        public int? PlatformId { get; set; }
         public DateTime? SurveyDate { get; set; }
         public int? Quarter { get; set; }
         public int? Year { get; set; }
 
-        public virtual Platform? Platform { get; set; }
         public virtual Project? Project { get; set; }
-        public virtual ICollection<ProjectOwner> ProjectOwners { get; set; }
 
+        public virtual ICollection<Platform> Platforms { get; set; }
         public virtual ICollection<Technology> Technologies { get; set; }
     }
 }

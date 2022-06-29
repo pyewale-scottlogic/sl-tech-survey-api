@@ -22,8 +22,6 @@ namespace TechSurveyAPI.Models
         public virtual DbSet<Project> Projects { get; set; } = null!;
         public virtual DbSet<ProjectOwner> ProjectOwners { get; set; } = null!;
         public virtual DbSet<ProjectSurvey> ProjectSurveys { get; set; } = null!;
-        public virtual DbSet<ProjectTechStack> ProjectTechStacks { get; set; } = null!;
-        public virtual DbSet<Survey> Surveys { get; set; } = null!;
         public virtual DbSet<Technology> Technologies { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -68,104 +66,94 @@ namespace TechSurveyAPI.Models
             {
                 entity.ToTable("Project");
 
-                entity.Property(e => e.Name).HasMaxLength(250);
+                entity.Property(e => e.KimbleUrl)
+                    .HasMaxLength(500)
+                    .IsUnicode(false)
+                    .HasColumnName("KimbleURL");
+
+                entity.Property(e => e.ProjectName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.Company)
                     .WithMany(p => p.Projects)
                     .HasForeignKey(d => d.CompanyId)
-                    .HasConstraintName("FK__Project__Company__44952D46");
+                    .HasConstraintName("FK__Project__Company__1A69E950");
             });
 
             modelBuilder.Entity<ProjectOwner>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => new { e.ProjectId, e.AccountOwnerId, e.TechLeadId })
+                    .IsClustered(false);
 
                 entity.ToTable("ProjectOwner");
 
-                entity.HasIndex(e => new { e.ProjectSurveyId, e.AccountOwnerId, e.TechLeadId }, "UQ_surveyEmp")
+                entity.HasIndex(e => new { e.ProjectId, e.AccountOwnerId, e.TechLeadId }, "UQ_surveyEmp")
                     .IsUnique()
                     .IsClustered();
 
-                entity.HasOne(d => d.AccountOwner)
-                    .WithMany()
-                    .HasForeignKey(d => d.AccountOwnerId)
-                    .HasConstraintName("FK__ProjectOw__Accou__603D47BB");
+                entity.Property(e => e.FromDate).HasColumnType("date");
 
-                entity.HasOne(d => d.ProjectSurvey)
-                    .WithMany()
-                    .HasForeignKey(d => d.ProjectSurveyId)
-                    .HasConstraintName("FK__ProjectOw__Proje__5F492382");
+                entity.Property(e => e.ProjectOwnerId).ValueGeneratedOnAdd();
+
+                entity.HasOne(d => d.AccountOwner)
+                    .WithMany(p => p.ProjectOwnerAccountOwners)
+                    .HasForeignKey(d => d.AccountOwnerId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__ProjectOw__Accou__740F363E");
+
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.ProjectOwners)
+                    .HasForeignKey(d => d.ProjectId)
+                    .HasConstraintName("FK__ProjectOw__Proje__731B1205");
 
                 entity.HasOne(d => d.TechLead)
-                    .WithMany()
+                    .WithMany(p => p.ProjectOwnerTechLeads)
                     .HasForeignKey(d => d.TechLeadId)
-                    .HasConstraintName("FK__ProjectOw__TechL__61316BF4");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__ProjectOw__TechL__75035A77");
             });
 
             modelBuilder.Entity<ProjectSurvey>(entity =>
             {
                 entity.ToTable("ProjectSurvey");
 
-                entity.HasIndex(e => e.PlatformId, "IX_ProjectSurvey_PlatformId");
-
-                entity.HasIndex(e => e.ProjectId, "IX_ProjectSurvey_ProjectId");
-
-                entity.HasIndex(e => e.SurveyId, "IX_ProjectSurvey_SurveyId");
-
-                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
-
                 entity.Property(e => e.SurveyDate).HasColumnType("date");
-
-                entity.HasOne(d => d.Platform)
-                    .WithMany(p => p.ProjectSurveys)
-                    .HasForeignKey(d => d.PlatformId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProjectSu__Platf__51EF2864");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.ProjectSurveys)
                     .HasForeignKey(d => d.ProjectId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProjectSu__Proje__5006DFF2");
+                    .HasConstraintName("FK__ProjectSu__Proje__1D4655FB");
 
-                entity.HasOne(d => d.Survey)
+                entity.HasMany(d => d.Platforms)
                     .WithMany(p => p.ProjectSurveys)
-                    .HasForeignKey(d => d.SurveyId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProjectSu__Surve__50FB042B");
-            });
+                    .UsingEntity<Dictionary<string, object>>(
+                        "ProjectSurveyPlatform",
+                        l => l.HasOne<Platform>().WithMany().HasForeignKey("PlatformId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__ProjectSu__Platf__6F4A8121"),
+                        r => r.HasOne<ProjectSurvey>().WithMany().HasForeignKey("ProjectSurveyId").HasConstraintName("FK__ProjectSu__Proje__6E565CE8"),
+                        j =>
+                        {
+                            j.HasKey("ProjectSurveyId", "PlatformId").IsClustered(false);
 
-            modelBuilder.Entity<ProjectTechStack>(entity =>
-            {
-                entity.ToTable("ProjectTechStack");
+                            j.ToTable("ProjectSurveyPlatform");
 
-                entity.HasIndex(e => e.ProjectSurveyId, "IX_ProjectTechStack_ProjectSurveyId");
+                            j.HasIndex(new[] { "ProjectSurveyId", "PlatformId" }, "UQ_ProjectSurveyPlatform").IsUnique().IsClustered();
+                        });
 
-                entity.HasIndex(e => e.TechnologyId, "IX_ProjectTechStack_TechnologyId");
+                entity.HasMany(d => d.Technologies)
+                    .WithMany(p => p.ProjectSurveys)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "ProjectSurveyTechnology",
+                        l => l.HasOne<Technology>().WithMany().HasForeignKey("TechnologyId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__ProjectSu__Techn__2C88998B"),
+                        r => r.HasOne<ProjectSurvey>().WithMany().HasForeignKey("ProjectSurveyId").HasConstraintName("FK__ProjectSu__Proje__2B947552"),
+                        j =>
+                        {
+                            j.HasKey("ProjectSurveyId", "TechnologyId").IsClustered(false);
 
-                entity.HasOne(d => d.ProjectSurvey)
-                    .WithMany(p => p.ProjectTechStacks)
-                    .HasForeignKey(d => d.ProjectSurveyId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProjectTe__Proje__59904A2C");
+                            j.ToTable("ProjectSurveyTechnology");
 
-                entity.HasOne(d => d.Technology)
-                    .WithMany(p => p.ProjectTechStacks)
-                    .HasForeignKey(d => d.TechnologyId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProjectTe__Techn__5A846E65");
-            });
-
-            modelBuilder.Entity<Survey>(entity =>
-            {
-                entity.ToTable("Survey");
-
-                entity.HasIndex(e => new { e.Quarter, e.Year }, "UQ_surveyYear")
-                    .IsUnique();
-
-                entity.Property(e => e.SurveyId).ValueGeneratedNever();
-
-                entity.Property(e => e.Year).HasMaxLength(4);
+                            j.HasIndex(new[] { "ProjectSurveyId", "TechnologyId" }, "UQ_ProjectSurveyTechnology").IsUnique().IsClustered();
+                        });
             });
 
             modelBuilder.Entity<Technology>(entity =>

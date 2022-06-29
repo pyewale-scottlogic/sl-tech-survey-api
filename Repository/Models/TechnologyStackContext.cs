@@ -83,36 +83,33 @@ namespace Repository.Models
 
             modelBuilder.Entity<ProjectOwner>(entity =>
             {
-                entity.HasKey(e => new { e.ProjectSurveyId, e.AccountOwnerId, e.TechLeadId })
-                    .HasName("PK_ProjectSurveyOwner")
+                entity.HasKey(e => e.ProjectOwnerId)
+                    .HasName("PK__ProjectO__82758B8F1B6E0F73")
                     .IsClustered(false);
 
                 entity.ToTable("ProjectOwner");
 
-                entity.HasIndex(e => new { e.ProjectSurveyId, e.AccountOwnerId, e.TechLeadId }, "UQ_surveyEmp")
+                entity.HasIndex(e => new { e.ProjectId, e.AccountOwnerId, e.TechLeadId }, "UQ_surveyEmp")
                     .IsUnique()
                     .IsClustered();
 
                 entity.Property(e => e.FromDate).HasColumnType("date");
 
-                entity.Property(e => e.ProjectOwnerId).ValueGeneratedOnAdd();
-
                 entity.HasOne(d => d.AccountOwner)
                     .WithMany(p => p.ProjectOwnerAccountOwners)
                     .HasForeignKey(d => d.AccountOwnerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProjectOw__Accou__5772F790");
+                    .HasConstraintName("FK__ProjectOw__Accou__79C80F94");
 
-                entity.HasOne(d => d.ProjectSurvey)
+                entity.HasOne(d => d.Project)
                     .WithMany(p => p.ProjectOwners)
-                    .HasForeignKey(d => d.ProjectSurveyId)
-                    .HasConstraintName("FK__ProjectOw__Proje__567ED357");
+                    .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__ProjectOw__Proje__78D3EB5B");
 
                 entity.HasOne(d => d.TechLead)
                     .WithMany(p => p.ProjectOwnerTechLeads)
                     .HasForeignKey(d => d.TechLeadId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__ProjectOw__TechL__58671BC9");
+                    .HasConstraintName("FK__ProjectOw__TechL__7ABC33CD");
             });
 
             modelBuilder.Entity<ProjectSurvey>(entity =>
@@ -121,15 +118,25 @@ namespace Repository.Models
 
                 entity.Property(e => e.SurveyDate).HasColumnType("date");
 
-                entity.HasOne(d => d.Platform)
-                    .WithMany(p => p.ProjectSurveys)
-                    .HasForeignKey(d => d.PlatformId)
-                    .HasConstraintName("FK__ProjectSu__Platf__1E3A7A34");
-
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.ProjectSurveys)
                     .HasForeignKey(d => d.ProjectId)
                     .HasConstraintName("FK__ProjectSu__Proje__1D4655FB");
+
+                entity.HasMany(d => d.Platforms)
+                    .WithMany(p => p.ProjectSurveys)
+                    .UsingEntity<Dictionary<string, object>>(
+                        "ProjectSurveyPlatform",
+                        l => l.HasOne<Platform>().WithMany().HasForeignKey("PlatformId").OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK__ProjectSu__Platf__6F4A8121"),
+                        r => r.HasOne<ProjectSurvey>().WithMany().HasForeignKey("ProjectSurveyId").HasConstraintName("FK__ProjectSu__Proje__6E565CE8"),
+                        j =>
+                        {
+                            j.HasKey("ProjectSurveyId", "PlatformId").IsClustered(false);
+
+                            j.ToTable("ProjectSurveyPlatform");
+
+                            j.HasIndex(new[] { "ProjectSurveyId", "PlatformId" }, "UQ_ProjectSurveyPlatform").IsUnique().IsClustered();
+                        });
 
                 entity.HasMany(d => d.Technologies)
                     .WithMany(p => p.ProjectSurveys)

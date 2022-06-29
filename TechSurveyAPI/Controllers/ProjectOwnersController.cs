@@ -7,7 +7,7 @@ using Repository.Repositories;
 
 namespace TechSurveyAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/projects/{projectId}/[controller]")]
     [ApiController]
     public class ProjectOwnersController : ControllerBase
     {
@@ -23,6 +23,7 @@ namespace TechSurveyAPI.Controllers
         }
 
         [HttpGet]
+        [Route("~/api/[controller]")]
         public async Task<IActionResult> ProjectOwner()
         {
             try
@@ -39,6 +40,33 @@ namespace TechSurveyAPI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllProjectOwnersForProjectAsync(int projectId)
+        {
+            try
+            {
+                if (projectId == 0)
+                {
+                    return BadRequest();
+                }
+
+                var projectOwners = await _repositoryWrapper.ProjectOwner.GetProjectOwnersByProjectId(projectId);
+
+                if (projectOwners == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(_mapper.Map<IEnumerable<ProjectOwnerDTO>>(projectOwners));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+
+        [Route("~/api/[controller]/{id}")]
         [HttpGet("{id}", Name = "ProjectOwnerById")]
         public async Task<IActionResult> ProjectOwner(int id)
         {
@@ -48,7 +76,7 @@ namespace TechSurveyAPI.Controllers
                 {
                     return BadRequest();
                 }
-                ProjectOwner projectOwnerExtracted = await _repositoryWrapper.ProjectOwner.GetProjectOwnerByProjectSurveyIdAsync(id);
+                ProjectOwner projectOwnerExtracted = await _repositoryWrapper.ProjectOwner.GetProjectOwnerAsync(id);
 
                 if (projectOwnerExtracted == null)
                 {
@@ -71,7 +99,7 @@ namespace TechSurveyAPI.Controllers
         {
             try
             {
-                if (projectOwnerAddDTO == null)
+                if (projectOwnerAddDTO == null || projectOwnerAddDTO.ProjectId < 1)
                 {
                     return BadRequest();
                 }
@@ -87,7 +115,7 @@ namespace TechSurveyAPI.Controllers
                 //ApiResult result = new ApiResult { Data = _projectOwnerDTO, ErrorMessage = "" };
                 //return CreatedAtRoute("ProjectOwnerById", new { id = _projectOwnerDTO.ProjectOwnerId }, result);
 
-                return CreatedAtRoute("ProjectOwnerById", new { id = _projectOwnerDTO.ProjectSurveyId }, _projectOwnerDTO);
+                return CreatedAtRoute("ProjectOwnerById", new { id = _projectOwnerDTO.ProjectOwnerId }, _projectOwnerDTO);
             }
             catch (Exception ex)
             {
@@ -98,7 +126,7 @@ namespace TechSurveyAPI.Controllers
 
         [HttpPut]
         public async Task<IActionResult> ProjectOwner([FromBody] ProjectOwnerUpdateDTO projectOwnerUpdateDTO)
-        {
+            {
             try
             {
                 if (projectOwnerUpdateDTO == null || !ModelState.IsValid)
@@ -106,7 +134,7 @@ namespace TechSurveyAPI.Controllers
                     return BadRequest();
                 }
 
-                ProjectOwner projectOwnerExtracted = await _repositoryWrapper.ProjectOwner.GetProjectOwnerByProjectSurveyIdAsync(projectOwnerUpdateDTO.ProjectSurveyId);
+                ProjectOwner projectOwnerExtracted = await _repositoryWrapper.ProjectOwner.GetProjectOwnerAsync(projectOwnerUpdateDTO.ProjectOwnerId);
 
                 if (projectOwnerExtracted == null)
                 {
@@ -127,12 +155,13 @@ namespace TechSurveyAPI.Controllers
         }
 
 
-        [HttpDelete("{id}")]
+        [HttpDelete]
+        [Route("~/api/[controller]/{id}")]
         public async Task<IActionResult> DeleteProjectOwner(int id)
         {
             try
             {
-                ProjectOwner projectOwnerExtracted = await _repositoryWrapper.ProjectOwner.GetProjectOwnerByProjectSurveyIdAsync(id);
+                ProjectOwner projectOwnerExtracted = await _repositoryWrapper.ProjectOwner.GetProjectOwnerAsync(id);
 
                 if (projectOwnerExtracted == null)
                 {

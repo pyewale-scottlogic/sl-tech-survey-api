@@ -22,5 +22,7 @@ namespace TechSurveyAPI.DTOs
         public ICollection<TechnologyDTO>? Technologies { get; set; }
 
         public ICollection<ProjectOwnerDTO>? ProjectOwners { get; set; }
+
+        public ICollection<PlatformDTO>? Platforms { get; set; }
     }
 }

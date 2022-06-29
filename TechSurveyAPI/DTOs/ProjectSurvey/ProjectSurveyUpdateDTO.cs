@@ -9,10 +9,7 @@ namespace TechSurveyAPI.DTOs
 
         [Required(ErrorMessage = "Project is mandatory!")]
         public int ProjectId { get; set; }
-
-        [Required(ErrorMessage = "Platform is mandatory!")]
-        public int PlatformId { get; set; }
-
+        
         [Required(ErrorMessage = "Quarter is mandatory!")]
         public int? Quarter { get; set; }
 
@@ -22,5 +19,7 @@ namespace TechSurveyAPI.DTOs
         public ICollection<TechnologyDTO>? Technologies { get; set; }
 
         public ICollection<ProjectOwnerUpdateDTO>? ProjectOwners { get; set; }
+
+        public ICollection<PlatformDTO>? Platforms { get; set; }
     }
 }

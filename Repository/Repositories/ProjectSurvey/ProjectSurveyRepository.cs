@@ -14,6 +14,9 @@ namespace Repository.Repositories
             foreach(Technology tec in projectSurvey.Technologies)
             this.TechnologyStackContext.Technologies.Attach(tec);
 
+            foreach (Platform plt in projectSurvey.Platforms)
+                this.TechnologyStackContext.Platforms.Attach(plt);
+
             Create(projectSurvey);
         }
 
@@ -24,15 +27,18 @@ namespace Repository.Repositories
 
         public async Task<IEnumerable<ProjectSurvey>> GetProjectSurveyAndRelatedDataByForProjectIdAsync(int projectId)
         {
-            return await FindByCondition(sr => sr.ProjectId.Equals(projectId)).Include(sr => sr.Technologies).Include(sr => sr.ProjectOwners)
-                .Include(sr => sr.Platform).Include(sr => sr.Project).ThenInclude(it => it.Company).ToListAsync();
-
-
+            return await FindByCondition(sr => sr.ProjectId.Equals(projectId)).
+                Include(sr => sr.Technologies).
+                Include(sr => sr.Platforms)
+                    .Include(sr => sr.Project).ThenInclude(pr => pr.Company)
+                    .Include(sr => sr.Project).ThenInclude(pr => pr.ProjectOwners).ThenInclude(po => po.AccountOwner)
+                    .Include(sr => sr.Project).ThenInclude(pr => pr.ProjectOwners).ThenInclude(po => po.TechLead)
+                .ToListAsync();
         }
 
         public async Task<ProjectSurvey> GetProjectSurveyAndRelatedDataByIdAsync(int projectSurveyId)
         {
-            return await this.TechnologyStackContext.ProjectSurveys.Include(sr => sr.Technologies).Include(sr => sr.ProjectOwners)
+            return await this.TechnologyStackContext.ProjectSurveys.Include(sr => sr.Technologies).Include(sr => sr.Platforms)
                 .Where(sr => sr.ProjectSurveyId == projectSurveyId)
                 .FirstOrDefaultAsync();
         }
@@ -55,6 +61,9 @@ namespace Repository.Repositories
 
             foreach (Technology tec in projectSurvey.Technologies)
                 this.TechnologyStackContext.Technologies.Attach(tec);
+
+            foreach(Platform plt in projectSurvey.Platforms)
+                this.TechnologyStackContext.Platforms.Attach(plt);
 
             Update(projectSurvey);
         }

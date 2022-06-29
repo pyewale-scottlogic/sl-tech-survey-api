@@ -7,6 +7,7 @@ namespace Repository.Models
     {
         public Project()
         {
+            ProjectOwners = new HashSet<ProjectOwner>();
             ProjectSurveys = new HashSet<ProjectSurvey>();
         }
 
@@ -17,6 +18,7 @@ namespace Repository.Models
         public int? CompanyId { get; set; }
 
         public virtual Company? Company { get; set; }
+        public virtual ICollection<ProjectOwner> ProjectOwners { get; set; }
         public virtual ICollection<ProjectSurvey> ProjectSurveys { get; set; }
     }
 }

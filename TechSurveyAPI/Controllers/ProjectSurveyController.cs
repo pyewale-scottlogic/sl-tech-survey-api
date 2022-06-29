@@ -121,7 +121,7 @@ namespace TechSurveyAPI.Controllers
                 //Somehow cascade delete is not working on child entities hence I have separately deleted related data
                 //Or we can update object in context with latest data and use saveAsync only once
                 projectSurveyExtracted.Technologies.Clear();
-                projectSurveyExtracted.ProjectOwners.Clear();
+                projectSurveyExtracted.Platforms.Clear();
                 await _repositoryWrapper.SaveAsync();
 
                 var _mappedProjectSurvey = _mapper.Map<ProjectSurvey>(projectSurveyUpdateDTO);

@@ -150,7 +150,7 @@ namespace TechSurveyAPI.Controllers
 
 
         
-        [Route("/api/[controller]/{id}")]
+        [Route("~/api/[controller]/{id}")]
         [HttpDelete]
         public async Task<IActionResult> Project(int id)
         {
